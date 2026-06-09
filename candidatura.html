@@ -227,7 +227,7 @@ document.getElementById("btnEnviar").addEventListener("click", async function() 
       var safeName = arquivo.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       var storagePath = timestamp + "_" + safeName;
       var uploadResp = await fetch(
-        SUPABASE_URL + "/storage/v1/object/curr%C3%ADculos/" + storagePath,
+        SUPABASE_URL + "/storage/v1/object/curriculos/" + encodeURIComponent(storagePath),
         {
           method: "POST",
           headers: {
@@ -239,7 +239,7 @@ document.getElementById("btnEnviar").addEventListener("click", async function() 
         }
       );
       if (uploadResp.ok) {
-        fileUrl = SUPABASE_URL + "/storage/v1/object/public/curr%C3%ADculos/" + storagePath;
+        fileUrl = SUPABASE_URL + "/storage/v1/object/public/curriculos/" + encodeURIComponent(storagePath);
       }
     } catch(uploadErr) {
       console.log("Erro upload storage:", uploadErr);
