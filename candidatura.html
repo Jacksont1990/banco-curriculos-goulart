@@ -30,9 +30,8 @@ textarea{resize:vertical;min-height:80px;}
 .cnh-opt{display:none;}
 .cnh-lbl{border:1.5px solid #e0e0e0;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;color:#777;cursor:pointer;transition:all 0.2s;user-select:none;}
 .cnh-opt:checked + .cnh-lbl{border-color:#c0001d;background:rgba(192,0,29,0.08);color:#c0001d;}
-.upload-zone{border:2px dashed #ddd;border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafafa;position:relative;}
+.upload-zone{border:2px dashed #ddd;border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafafa;}
 .upload-zone:hover,.upload-zone.drag{border-color:#c0001d;background:rgba(192,0,29,0.03);}
-.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .upload-ico{font-size:26px;margin-bottom:5px;}
 .upload-txt{font-size:13px;font-weight:600;color:#777;}
 .upload-sub{font-size:11px;color:#aaa;margin-top:2px;}
@@ -96,10 +95,10 @@ textarea{resize:vertical;min-height:80px;}
     </div>
     <div class="sec-title">Curriculo</div>
     <div class="field"><label>Anexar curriculo <span>*</span></label>
-      <div class="upload-zone" id="uploadZone">
-        <input type="file" id="arquivo" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleFile(this)"/>
+      <input type="file" id="arquivo" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none" onchange="handleFile(this)"/>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('arquivo').click()">
         <div class="upload-ico">📄</div>
-        <div class="upload-txt">Clique ou arraste seu curriculo aqui</div>
+        <div class="upload-txt">Clique aqui para selecionar seu curriculo</div>
         <div class="upload-sub">PDF, Word ou imagem</div>
         <div class="file-ok" id="fileName"></div>
       </div>
@@ -125,7 +124,7 @@ const SYSTEM = "Extraia as informacoes do curriculo e retorne APENAS JSON: {nome
 const zone = document.getElementById("uploadZone");
 zone.addEventListener("dragover",e=>{e.preventDefault();zone.classList.add("drag");});
 zone.addEventListener("dragleave",()=>zone.classList.remove("drag"));
-zone.addEventListener("drop",e=>{e.preventDefault();zone.classList.remove("drag");const f=e.dataTransfer.files[0];if(f){document.getElementById("arquivo").files=e.dataTransfer.files;handleFile(null,f);}});
+zone.addEventListener("drop",e=>{e.preventDefault();zone.classList.remove("drag");const f=e.dataTransfer.files[0];if(f){handleFile(null,f);}});
 function handleFile(inp,f){const file=f||(inp&&inp.files[0]);if(file)document.getElementById("fileName").textContent="Arquivo: "+file.name;}
 function showErr(msg){const e=document.getElementById("errMsg");e.textContent=msg;e.style.display="block";setTimeout(()=>e.style.display="none",5000);}
 function toBase64(buf){let b="";const u=new Uint8Array(buf);for(let i=0;i<u.byteLength;i++)b+=String.fromCharCode(u[i]);return btoa(b);}
