@@ -244,7 +244,7 @@ document.getElementById("btnEnviar").addEventListener("click", async function() 
       var uploadBody = await uploadResp.text();
       console.log("Upload status:", uploadResp.status, uploadBody);
       if (uploadResp.ok) {
-        fileUrl = SUPABASE_URL + "/storage/v1/object/public/curriculos/" + encodeURIComponent(storagePath);
+        fileUrl = SUPABASE_URL + "/storage/v1/object/public/curriculos/" + storagePath.replace(/ /g, "%20");
         console.log("File URL:", fileUrl);
       }
     } catch(uploadErr) {
