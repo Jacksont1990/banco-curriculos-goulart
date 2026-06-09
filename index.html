@@ -425,7 +425,7 @@ async function processFile(file){
   const response=await fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
     headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,system:SYSTEM_PROMPT,messages}),
+    body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:1500,system:SYSTEM_PROMPT,messages}),
   });
   const raw=await response.text();
   if(!response.ok){let m=`HTTP ${response.status}`;try{m=JSON.parse(raw).error?.message||m;}catch{}throw new Error(m);}
