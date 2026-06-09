@@ -364,6 +364,7 @@ function renderDetail() {
       </div>
       <div class="det-actions">
         <button class="btn-del" onclick="askDelete('${c.id}')">🗑️ Remover</button>
+        ${c.fileUrl ? `<a href="${c.fileUrl}" target="_blank" style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.4);color:#818cf8;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:600;text-decoration:none;">📄 Ver Currículo</a>` : ""}
         <button class="btn-close" onclick="selectCard('${c.id}')">✕</button>
       </div>
     </div>
