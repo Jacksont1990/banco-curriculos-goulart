@@ -220,6 +220,31 @@ document.getElementById("btnEnviar").addEventListener("click", async function() 
       if (match) cv = JSON.parse(match[0]);
     } catch(e) {}
 
+    // Upload file to Supabase Storage
+    var fileUrl = "";
+    try {
+      var timestamp = Date.now();
+      var safeName = arquivo.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      var storagePath = timestamp + "_" + safeName;
+      var uploadResp = await fetch(
+        SUPABASE_URL + "/storage/v1/object/curr%C3%ADculos/" + storagePath,
+        {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: "Bearer " + SUPABASE_KEY,
+            "Content-Type": arquivo.type || "application/octet-stream"
+          },
+          body: arquivo
+        }
+      );
+      if (uploadResp.ok) {
+        fileUrl = SUPABASE_URL + "/storage/v1/object/public/curr%C3%ADculos/" + storagePath;
+      }
+    } catch(uploadErr) {
+      console.log("Erro upload storage:", uploadErr);
+    }
+
     var record = {
       nome: nome,
       telefone: telefone || cv.telefone || "",
@@ -235,6 +260,7 @@ document.getElementById("btnEnviar").addEventListener("click", async function() 
       nivel_experiencia: cv.nivelExperiencia || "",
       resumo: cv.resumo || "",
       file_name: arquivo.name,
+      file_url: fileUrl,
       origem: "Formulario Web"
     };
 
