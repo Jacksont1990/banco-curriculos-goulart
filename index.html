@@ -22,9 +22,26 @@ body.light .header{background:linear-gradient(135deg,#c0001d,#8b0015);}
 .badge-vencidos .lbl{font-size:9px;color:rgba(245,158,11,0.8);}
 .btn-theme{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:7px 12px;color:#fff;font-size:12px;cursor:pointer;font-weight:600;}
 .stripe{height:3px;background:linear-gradient(90deg,#c0001d,#ff2040,#c0001d);}
+/* Region stats bar */
+.regiao-bar{background:#111;border-bottom:1px solid #222;padding:8px 24px;display:flex;align-items:center;gap:8px;overflow-x:auto;flex-wrap:nowrap;}
+body.light .regiao-bar{background:#f0f0f0;border-bottom-color:#ddd;}
+.regiao-bar::-webkit-scrollbar{height:3px;}
+.regiao-bar::-webkit-scrollbar-thumb{background:#c0001d44;border-radius:4px;}
+.regiao-tag{display:flex;align-items:center;gap:6px;background:rgba(192,0,29,0.1);border:1px solid rgba(192,0,29,0.25);border-radius:20px;padding:4px 12px;cursor:pointer;white-space:nowrap;transition:all 0.18s;flex-shrink:0;}
+.regiao-tag:hover{background:rgba(192,0,29,0.2);border-color:rgba(192,0,29,0.5);}
+.regiao-tag.active{background:rgba(192,0,29,0.3);border-color:#c0001d;}
+body.light .regiao-tag{background:rgba(192,0,29,0.07);border-color:rgba(192,0,29,0.2);}
+body.light .regiao-tag.active{background:rgba(192,0,29,0.15);border-color:#c0001d;}
+.regiao-tag .r-nome{font-size:11px;font-weight:600;color:#ffaaaa;}
+body.light .regiao-tag .r-nome{color:#c0001d;}
+.regiao-tag .r-num{font-size:13px;font-weight:800;color:#ff4466;}
+body.light .regiao-tag .r-num{color:#a00018;}
+.regiao-bar-label{font-size:10px;color:#444;font-weight:700;letter-spacing:1px;text-transform:uppercase;flex-shrink:0;}
+body.light .regiao-bar-label{color:#aaa;}
+
 
 /* Layout */
-.layout{display:flex;height:calc(100vh - 90px);}
+.layout{display:flex;height:calc(100vh - 130px);}
 .left{padding:16px 16px 16px 24px;overflow-y:auto;transition:width 0.3s;}
 .left.full{width:100%;}
 .left.half{width:42%;border-right:1px solid #333;}
@@ -162,6 +179,11 @@ body.light .modal h3{color:#1a1a1a;}
 </div>
 <div class="stripe"></div>
 
+
+<div class="regiao-bar" id="regiaoBar" style="display:none">
+  <span class="regiao-bar-label">📍 Regiões</span>
+  <div id="regiao-tags" style="display:flex;gap:8px;flex-wrap:nowrap;"></div>
+</div>
 <div class="layout">
   <div class="left full" id="left">
 
@@ -179,7 +201,7 @@ body.light .modal h3{color:#1a1a1a;}
       <select id="filterCargo" onchange="renderCards()"><option value="">Todos os cargos</option></select>
       <select id="filterRegiao" onchange="renderCards()">
         <option value="">Todas as regiões</option>
-        <option>Norte</option><option>Nordeste</option><option>Centro-Oeste</option><option>Sudeste</option><option>Sul</option>
+        
       </select>
       <button id="btnVencidos" onclick="toggleVencidos()">⏰ +45 dias</button>
     </div>
@@ -256,6 +278,7 @@ async function loadCandidates() {
     document.getElementById("loading-db").style.display = "none";
     if (candidates.length > 0) document.getElementById("filters").style.display = "flex";
     updateCargosFilter();
+    updateRegioesFilter(); updateRegiaoBar();
     renderCards();
     updateHeader();
   } catch(e) {
@@ -275,11 +298,49 @@ function updateHeader() {
   else bv.style.display="none";
 }
 
+
+let filterRegiaoDirect = "";
+
+function updateRegiaoBar() {
+  const counts = {};
+  candidates.forEach(c => {
+    const r = c.regiao || "Não informado";
+    counts[r] = (counts[r] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  const bar = document.getElementById("regiaoBar");
+  const tags = document.getElementById("regiao-tags");
+  if (sorted.length === 0) { bar.style.display = "none"; return; }
+  bar.style.display = "flex";
+  tags.innerHTML = sorted.map(([r, n]) =>
+    `<div class="regiao-tag${filterRegiaoDirect===r?" active":""}" onclick="toggleRegiaoDirect('${r}')">
+      <span class="r-num">${n}</span>
+      <span class="r-nome">${r}</span>
+    </div>`
+  ).join("");
+}
+
+function toggleRegiaoDirect(r) {
+  filterRegiaoDirect = filterRegiaoDirect === r ? "" : r;
+  // Also sync the select filter
+  const sel = document.getElementById("filterRegiao");
+  sel.value = filterRegiaoDirect;
+  updateRegiaoBar();
+  renderCards();
+}
+
 function updateCargosFilter() {
   const all = [...new Set(candidates.flatMap(c=>c.cargosPretendidos||[]))];
   const sel = document.getElementById("filterCargo");
   const cur = sel.value;
   sel.innerHTML = '<option value="">Todos os cargos</option>' + all.map(c=>`<option${c===cur?" selected":""}>${c}</option>`).join("");
+}
+
+function updateRegioesFilter() {
+  const all = [...new Set(candidates.map(c=>c.regiao).filter(Boolean))].sort();
+  const sel = document.getElementById("filterRegiao");
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Todas as regiões</option>' + all.map(r=>`<option${r===cur?" selected":""}>${r}</option>`).join("");
 }
 
 function toggleVencidos() {
@@ -290,6 +351,10 @@ function toggleVencidos() {
 }
 
 function renderCards() {
+  // Keep bar in sync with select filter
+  const selVal = document.getElementById("filterRegiao") ? document.getElementById("filterRegiao").value : "";
+  if (selVal !== filterRegiaoDirect) { filterRegiaoDirect = selVal; updateRegiaoBar(); }
+
   const q = document.getElementById("searchInput").value.toLowerCase();
   const fc = document.getElementById("filterCargo").value.toLowerCase();
   const fr = document.getElementById("filterRegiao").value.toLowerCase();
@@ -394,7 +459,7 @@ async function confirmDelete(){
   candidates = candidates.filter(c=>c.id!==deleteId);
   if (selectedId===deleteId) selectCard(deleteId);
   deleteId=null;
-  updateHeader(); updateCargosFilter(); renderCards();
+  updateHeader(); updateCargosFilter(); updateRegioesFilter(); updateRegiaoBar(); renderCards();
   if(candidates.length>0) document.getElementById("filters").style.display="flex";
 }
 
@@ -476,7 +541,7 @@ async function handleFiles(files){
       const cand={...data,id:s?.id||Date.now().toString(),dataEnvio:s?.data_envio||new Date().toISOString(),fileName:file.name,origem:"Manual"};
       candidates.unshift(cand);
       document.getElementById("filters").style.display="flex";
-      updateCargosFilter(); renderCards(); updateHeader();
+      updateCargosFilter(); updateRegioesFilter(); updateRegiaoBar(); renderCards(); updateHeader();
     }catch(e){
       document.getElementById("errors").innerHTML+=`<div class="err">⚠️ "${file.name}": ${e.message}</div>`;
     }
