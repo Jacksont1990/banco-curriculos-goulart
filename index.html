@@ -266,7 +266,7 @@ async function loadCandidates() {
     const data = await sbGetAll();
     candidates = (Array.isArray(data) ? data : []).map(c => ({
       id: c.id, nome: c.nome, telefone: c.telefone, email: c.email,
-      cidade: c.cidade, estado: c.estado, regiao: c.regiao, idade: c.idade,
+      cidade: c.cidade, estado: c.estado, regiao: normalizeRegiao(c.regiao), idade: c.idade,
       cargosPretendidos: c.cargos_pretendidos || [],
       habilidades: c.habilidades || [],
       experiencias: c.experiencias || [],
@@ -298,6 +298,26 @@ function updateHeader() {
   else bv.style.display="none";
 }
 
+
+
+const REGIAO_MAP = {
+  "Antonio Carlos": "Antonio Carlos - SC",
+  "Tubarao": "Tubarao - SC",
+  "Balneario Camboriu": "Balneario Camboriu - SC",
+  "Itajai": "Itajai - SC",
+  "Cachoeirinha": "Cachoeirinha - RS",
+  "Qualquer regiao": "Qualquer regiao",
+  "Norte": "Norte",
+  "Nordeste": "Nordeste",
+  "Centro-Oeste": "Centro-Oeste",
+  "Sudeste": "Sudeste",
+  "Sul": "Sul"
+};
+
+function normalizeRegiao(r) {
+  if (!r) return "";
+  return REGIAO_MAP[r.trim()] || r;
+}
 
 let filterRegiaoDirect = "";
 
