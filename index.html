@@ -129,6 +129,17 @@ body.light .modal h3{color:#1a1a1a;}
 .modal-btns button{padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;}
 .btn-cancel{border:1px solid #333;background:transparent;color:#777;}
 .btn-confirm{border:none;background:#c0001d;color:#fff;font-weight:700;}
+
+.login-bg{position:fixed;inset:0;background:linear-gradient(135deg,#0d0d0d,#1a0005);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.login-card{background:#1a1a1a;border-radius:18px;border:2px solid #c0001d;padding:40px 36px;width:100%;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(192,0,29,0.3);}
+.login-card img{height:70px;object-fit:contain;margin-bottom:20px;}
+.login-card h2{color:#f0f0f0;font-size:18px;font-weight:800;margin-bottom:6px;}
+.login-card p{color:#666;font-size:12px;margin-bottom:24px;}
+.login-input{width:100%;background:#242424;border:1.5px solid #333;border-radius:10px;padding:12px 16px;color:#f0f0f0;font-size:14px;outline:none;text-align:center;letter-spacing:3px;font-family:inherit;margin-bottom:12px;}
+.login-input:focus{border-color:#c0001d;box-shadow:0 0 0 3px rgba(192,0,29,0.15);}
+.login-btn{width:100%;padding:13px;background:linear-gradient(135deg,#c0001d,#e8001f);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:0.5px;}
+.login-btn:hover{opacity:0.9;}
+.login-err{color:#ef4444;font-size:12px;margin-top:8px;display:none;}
 </style>
 </head>
 <body>
@@ -475,6 +486,35 @@ async function handleFiles(files){
 }
 
 loadCandidates();
+</script>
+
+<div id="loginBg" class="login-bg">
+  <div class="login-card">
+    <img src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" alt="Goulart"/>
+    <h2>Banco de Curriculos</h2>
+    <p>Digite a senha para acessar o sistema</p>
+    <input type="password" class="login-input" id="loginInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkLogin()"/>
+    <button class="login-btn" onclick="checkLogin()">Entrar</button>
+    <div class="login-err" id="loginErr">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+<script>
+// Check session
+if(sessionStorage.getItem("goulart_auth")==="ok"){
+  document.getElementById("loginBg").style.display="none";
+}
+function checkLogin(){
+  const val = document.getElementById("loginInput").value;
+  const hash = ["Gou","lar","t"].join("");
+  if(val === hash){
+    sessionStorage.setItem("goulart_auth","ok");
+    document.getElementById("loginBg").style.display="none";
+  } else {
+    document.getElementById("loginErr").style.display="block";
+    document.getElementById("loginInput").value="";
+    document.getElementById("loginInput").focus();
+  }
+}
 </script>
 </body>
 </html>
