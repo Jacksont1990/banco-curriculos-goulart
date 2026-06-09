@@ -251,7 +251,7 @@ async function loadCandidates() {
       estabilidadeMedia: c.estabilidade_media,
       nivelExperiencia: c.nivel_experiencia,
       resumo: c.resumo, dataEnvio: c.data_envio,
-      fileName: c.file_name, origem: c.origem,
+      fileName: c.file_name, fileUrl: c.file_url, origem: c.origem,
     }));
     document.getElementById("loading-db").style.display = "none";
     if (candidates.length > 0) document.getElementById("filters").style.display = "flex";
